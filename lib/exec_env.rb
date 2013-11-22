@@ -1,5 +1,5 @@
 require "exec_env/version"
 
-class ExecEnv
+module ExecEnv
   
 end
