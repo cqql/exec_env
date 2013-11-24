@@ -54,7 +54,7 @@ module ExecEnv
       result = nil
       captured = false
             
-      if @locals && @locals.key?(name)
+      if @locals && @locals.key?(name) && args.size == 0 && !block
         captured = true
         result = @locals[name]
       elsif @scope && @scope.respond_to?(name)

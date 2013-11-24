@@ -51,6 +51,22 @@ describe ExecEnv::Env do
     expect(value).to eq :value
   end
 
+  it "should dispatch method calls to locals" do
+    value = nil
+    scope = Object.new
+    def scope.it (value)
+      value
+    end
+
+    env.scope = scope
+    env.bindings = { it: :binding }
+    env.exec do
+      value = it(:scope)
+    end
+
+    expect(value).to eq :scope
+  end
+
   it "should overshadow scope bindings with explicit ones" do
     value = nil
     scope = Object.new
@@ -98,7 +114,7 @@ describe ExecEnv::Env do
       name(:var, &block)
     end
 
-    expect(env.captured_messages).to eq [[:bind, [], nil], [:number, [], nil], [:bind, [15], nil]]
+    expect(env.captured_messages).to eq [[:bind, [], nil], [:number, [], nil]]
   end
   
   it "should track free messages" do
@@ -118,7 +134,7 @@ describe ExecEnv::Env do
       name(:var, &block)
     end
 
-    expect(env.free_messages).to eq [[:name, [:var], block]]
+    expect(env.free_messages).to eq [[:bind, [15], nil], [:name, [:var], block]]
   end
 
   it "should pass arguments to the block" do
