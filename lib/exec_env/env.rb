@@ -19,7 +19,7 @@ module ExecEnv
     end
 
     # Execute a block in the manipulated environent.
-    def exec (&block)
+    def exec (*args, &block)
       if @scope
         @scope.instance_variables.each do |name|
           instance_variable_set(name, @scope.instance_variable_get(name))
@@ -32,7 +32,7 @@ module ExecEnv
         end
       end
             
-      instance_exec(&block)
+      instance_exec(*args, &block)
     end
 
     # The messages that were sent "in" the block in order of capturing.

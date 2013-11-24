@@ -100,4 +100,14 @@ describe ExecEnv::Env do
 
     expect(env.captured_messages).to eq [[:bind, [], nil], [:number, [], nil], [:bind, [15], nil], [:name, [:var], block]]
   end
+
+  it "should pass arguments to the block" do
+    value = nil
+
+    env.exec -10, 3 do |num, factor|
+      value = num * factor
+    end
+
+    expect(value).to eq -30
+  end
 end
