@@ -35,6 +35,10 @@ module ExecEnv
       instance_exec(&block)
     end
 
+    # The messages that were sent "in" the block in order of capturing.
+    #
+    # Returns an array of arrays are structured as
+    # [<name>, <array of parameters>, <block or nil>]
     def captured_messages
       @captured_messages
     end
