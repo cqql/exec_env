@@ -80,4 +80,24 @@ describe ExecEnv::Env do
 
     expect(value).to eq :binding
   end
+
+  it "should capture sent messages" do
+    block = -> { :block }
+    scope = Object.new
+    def scope.number
+      10
+    end
+
+    env.bindings = { bind: 5 }
+    env.scope = scope
+    env.exec do
+      var = bind
+      var += number
+
+      bind 15
+      name(:var, &block)
+    end
+
+    expect(env.captured_messages).to eq [[:bind, [], nil], [:number, [], nil], [:bind, [15], nil], [:name, [:var], block]]
+  end
 end

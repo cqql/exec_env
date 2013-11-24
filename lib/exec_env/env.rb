@@ -1,5 +1,12 @@
 module ExecEnv
+  # A manipulatable execution environment, that let's you inject local and
+  # instance variables into a block and capture messages sent during it's
+  # execution.
   class Env
+    def initialize
+      @captured_messages = []
+    end
+    
     def bindings= (bindings)
       @instance_vars, @locals = bindings.partition { |name, _| name.to_s.chars[0] == "@" }
 
@@ -11,6 +18,7 @@ module ExecEnv
       @scope = scope
     end
 
+    # Execute a block in the manipulated environent.
     def exec (&block)
       if @scope
         @scope.instance_variables.each do |name|
@@ -27,7 +35,13 @@ module ExecEnv
       instance_exec(&block)
     end
 
+    def captured_messages
+      @captured_messages
+    end
+
     def method_missing (name, *args, &block)
+      @captured_messages << [name, args, block]
+      
       if @locals && @locals.key?(name)
         @locals[name]
       elsif @scope && @scope.respond_to?(name)
