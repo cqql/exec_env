@@ -12,18 +12,18 @@ module ExecEnv
     end
 
     def exec (&block)
-      if @instance_vars
-        @instance_vars.each do |name, value|
-          instance_variable_set(name, value)
-        end
-      end
-
       if @scope
         @scope.instance_variables.each do |name|
           instance_variable_set(name, @scope.instance_variable_get(name))
         end
       end
-      
+
+      if @instance_vars
+        @instance_vars.each do |name, value|
+          instance_variable_set(name, value)
+        end
+      end
+            
       instance_exec(&block)
     end
 

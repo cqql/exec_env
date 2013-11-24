@@ -50,4 +50,34 @@ describe ExecEnv::Env do
 
     expect(value).to eq :value
   end
+
+  it "should overshadow scope bindings with explicit ones" do
+    value = nil
+    scope = Object.new
+    def scope.it
+      :scope
+    end
+
+    env.scope = scope
+    env.bindings = { it: :binding }
+    env.exec do
+      value = it
+    end
+
+    expect(value).to eq :binding
+  end
+
+  it "should overshadow scope ivars with explicit ones" do
+    value = nil
+    scope = Object.new
+    scope.instance_variable_set(:@it, :scope)
+
+    env.scope = scope
+    env.bindings = { :@it => :binding }
+    env.exec do
+      value = @it
+    end
+
+    expect(value).to eq :binding
+  end
 end
