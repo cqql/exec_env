@@ -81,7 +81,7 @@ describe ExecEnv::Env do
     expect(value).to eq :binding
   end
 
-  it "should capture sent messages" do
+  it "should track captured messages" do
     block = -> { :block }
     scope = Object.new
     def scope.number
@@ -98,7 +98,27 @@ describe ExecEnv::Env do
       name(:var, &block)
     end
 
-    expect(env.captured_messages).to eq [[:bind, [], nil], [:number, [], nil], [:bind, [15], nil], [:name, [:var], block]]
+    expect(env.captured_messages).to eq [[:bind, [], nil], [:number, [], nil], [:bind, [15], nil]]
+  end
+  
+  it "should track free messages" do
+    block = -> { :block }
+    scope = Object.new
+    def scope.number
+      10
+    end
+
+    env.bindings = { bind: 5 }
+    env.scope = scope
+    env.exec do
+      var = bind
+      var += number
+
+      bind 15
+      name(:var, &block)
+    end
+
+    expect(env.free_messages).to eq [[:name, [:var], block]]
   end
 
   it "should pass arguments to the block" do

@@ -4,7 +4,7 @@ module ExecEnv
   # execution.
   class Env
     def initialize
-      @captured_messages = []
+      @messages = []
     end
     
     def bindings= (bindings)
@@ -35,24 +35,36 @@ module ExecEnv
       instance_exec(*args, &block)
     end
 
-    # The messages that were sent "in" the block in order of capturing.
+    # The messages that were sent "in" the block and were "captured" by the
+    # scope or locals. They are in call-order.
     #
-    # Returns an array of arrays are structured as
+    # Returns an array of arrays structured as
     # [<name>, <array of parameters>, <block or nil>]
     def captured_messages
-      @captured_messages
+      @messages.select { |m| m.first }.map { |m| m[1] }
+    end
+
+    # The messages that were sent "in" the block and were not captured by
+    # the scope or locals. The are in call-order.
+    def free_messages
+      @messages.select { |m| !m.first }.map { |m| m[1] }
     end
 
     def method_missing (name, *args, &block)
-      @captured_messages << [name, args, block]
-      
+      result = nil
+      captured = false
+            
       if @locals && @locals.key?(name)
-        @locals[name]
+        captured = true
+        result = @locals[name]
       elsif @scope && @scope.respond_to?(name)
-        @scope.send(name)
-      else
-        nil
+        captured = true
+        result = @scope.send(name, *args, &block)
       end
+
+      @messages << [captured, [name, args, block]]
+
+      result
     end
   end
 end
