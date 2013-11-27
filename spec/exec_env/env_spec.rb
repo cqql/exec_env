@@ -1,10 +1,10 @@
 describe ExecEnv::Env do
   let(:env) { ExecEnv::Env.new }
 
-  it "should allow setting unbound variables" do
+  it "should allow injecting locals" do
     value = nil
 
-    env.bindings = { it: 5 }
+    env.locals = { it: 5 }
     env.exec do
       value = it
     end
@@ -12,10 +12,10 @@ describe ExecEnv::Env do
     expect(value).to eq 5
   end
 
-  it "should allow setting instance variables" do
+  it "should allow injecting instance variables" do
     value = nil
 
-    env.bindings = { :@bind => :test }
+    env.ivars = { :@bind => :test }
     env.exec do
       value = @bind
     end
@@ -67,7 +67,7 @@ describe ExecEnv::Env do
     expect(value).to eq :scope
   end
 
-  it "should overshadow scope bindings with explicit ones" do
+  it "should evaluate locals before scope methods" do
     value = nil
     scope = Object.new
     def scope.it
@@ -75,7 +75,7 @@ describe ExecEnv::Env do
     end
 
     env.scope = scope
-    env.bindings = { it: :binding }
+    env.locals = { it: :binding }
     env.exec do
       value = it
     end
@@ -89,7 +89,7 @@ describe ExecEnv::Env do
     scope.instance_variable_set(:@it, :scope)
 
     env.scope = scope
-    env.bindings = { :@it => :binding }
+    env.ivars = { :@it => :binding }
     env.exec do
       value = @it
     end
@@ -104,7 +104,7 @@ describe ExecEnv::Env do
       10
     end
 
-    env.bindings = { bind: 5 }
+    env.locals = { bind: 5 }
     env.scope = scope
     env.exec do
       var = bind
@@ -124,7 +124,7 @@ describe ExecEnv::Env do
       10
     end
 
-    env.bindings = { bind: 5 }
+    env.locals = { bind: 5 }
     env.scope = scope
     env.exec do
       var = bind

@@ -3,17 +3,15 @@ module ExecEnv
   # instance variables into a block and capture messages sent during it's
   # execution.
   class Env
+    attr_writer :locals
+    attr_writer :ivars
+    
     def initialize
       @messages = []
+      @locals = {}
+      @ivars = {}
     end
     
-    def bindings= (bindings)
-      @instance_vars, @locals = bindings.partition { |name, _| name.to_s.chars[0] == "@" }
-
-      @locals = Hash[@locals]
-      @instance_vars = Hash[@instance_vars]
-    end
-
     def scope= (scope)
       @scope = scope
     end
@@ -26,8 +24,8 @@ module ExecEnv
         end
       end
 
-      if @instance_vars
-        @instance_vars.each do |name, value|
+      if @ivars
+        @ivars.each do |name, value|
           instance_variable_set(name, value)
         end
       end
