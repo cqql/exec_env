@@ -116,7 +116,22 @@ describe ExecEnv::Env do
 
     expect(env.messages).to eq [[:foo, [15], nil], [:name, [:var, 33], block]]
   end
-  
+
+  it "should allow bypassing locals and the scope with xsend" do
+    scope = Object.new
+    def scope.foo (arg)
+      :in_scope
+    end
+
+    env.scope = scope
+    env.locals = { foo: 12 }
+    env.exec do
+      xsend :foo, 37
+    end
+
+    expect(env.messages).to eq [[:foo, [37], nil]]
+  end
+
   it "should pass arguments to the block" do
     value = nil
 

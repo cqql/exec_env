@@ -68,6 +68,12 @@ module ExecEnv
       instance_exec(*args, &block)
     end
 
+    # Send a message, that completely bypasses the locals
+    # and the scope and is added directly to #messages.
+    def xsend (name, *args, &block)
+      @messages << [name, args, block]
+    end
+
     def method_missing (name, *args, &block)
       if @locals.key?(name) && args.size == 0 && !block
         @locals[name]
