@@ -25,6 +25,22 @@ module ExecEnv
     #   # the String object "An object"
     #   env.scope = "An object"
     attr_accessor :scope
+
+    # An array of all messages that were not captured by locals or
+    # the scope object.
+    #
+    # Examples
+    #
+    #   env.exec do
+    #     test :foo, "bar"
+    #     each do
+    #       # ...
+    #     end
+    #   end
+    #
+    #   env.messages
+    #   # => [[:test, [:foo, "bar], nil], [:each, [], <the block>]]
+    attr_reader :messages
     
     def initialize (locals: {}, ivars: {}, scope: nil)
       @messages = []
@@ -52,36 +68,16 @@ module ExecEnv
       instance_exec(*args, &block)
     end
 
-    # The messages that were sent "in" the block and were "captured" by the
-    # scope or locals. They are in call-order.
-    #
-    # Returns an array of arrays structured as
-    # [<name>, <array of parameters>, <block or nil>]
-    def captured_messages
-      @messages.select { |m| m.first }.map { |m| m[1] }
-    end
-
-    # The messages that were sent "in" the block and were not captured by
-    # the scope or locals. The are in call-order.
-    def free_messages
-      @messages.select { |m| !m.first }.map { |m| m[1] }
-    end
-
     def method_missing (name, *args, &block)
-      result = nil
-      captured = false
-      
       if @locals.key?(name) && args.size == 0 && !block
-        captured = true
-        result = @locals[name]
+        @locals[name]
       elsif @scope && @scope.respond_to?(name)
-        captured = true
-        result = @scope.send(name, *args, &block)
+        @scope.send(name, *args, &block)
+      else
+        @messages << [name, args, block]
+
+        nil
       end
-
-      @messages << [captured, [name, args, block]]
-
-      result
     end
   end
 end
