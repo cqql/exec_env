@@ -3,9 +3,28 @@ module ExecEnv
   # instance variables into a block and capture messages sent during it's
   # execution.
   class Env
-    attr_writer :locals
-    attr_writer :ivars
-    attr_writer :scope
+    # A hash of local variables, that will be injected into the block
+    #
+    # Examples
+    #
+    #   env.locals = { foo: 3, bar: :symbol }
+    attr_accessor :locals
+
+    # A hash of instance variables, that will be injected into the block
+    #
+    # Examples
+    #
+    #   env.ivars = { :@foo => 3, :@bar => :symbol }
+    attr_accessor :ivars
+
+    # An object, that will serve as the scope of execution of the block
+    #
+    # Examples
+    #
+    #   # Unresolved method calls in the block will be forwarded to
+    #   # the String object "An object"
+    #   env.scope = "An object"
+    attr_accessor :scope
     
     def initialize
       @messages = []
