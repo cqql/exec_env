@@ -26,11 +26,11 @@ module ExecEnv
     #   env.scope = "An object"
     attr_accessor :scope
     
-    def initialize
+    def initialize (locals: {}, ivars: {}, scope: nil)
       @messages = []
-      @locals = {}
-      @ivars = {}
-      @scope = nil
+      @locals = locals
+      @ivars = ivars
+      @scope = scope
     end
 
     # Execute a block in the manipulated environment.
