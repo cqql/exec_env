@@ -36,6 +36,8 @@ module ExecEnv
     # Execute a block in the manipulated environment.
     #
     # Additional arguments will be passed to the block.
+    #
+    # Returns the return value of the block
     def exec (*args, &block)
       if @scope
         @scope.instance_variables.each do |name|
@@ -43,12 +45,10 @@ module ExecEnv
         end
       end
 
-      if @ivars
-        @ivars.each do |name, value|
-          instance_variable_set(name, value)
-        end
+      @ivars.each do |name, value|
+        instance_variable_set(name, value)
       end
-            
+      
       instance_exec(*args, &block)
     end
 
@@ -70,8 +70,8 @@ module ExecEnv
     def method_missing (name, *args, &block)
       result = nil
       captured = false
-            
-      if @locals && @locals.key?(name) && args.size == 0 && !block
+      
+      if @locals.key?(name) && args.size == 0 && !block
         captured = true
         result = @locals[name]
       elsif @scope && @scope.respond_to?(name)

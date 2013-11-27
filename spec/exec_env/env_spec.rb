@@ -146,4 +146,12 @@ describe ExecEnv::Env do
 
     expect(value).to eq -30
   end
+
+  it "should return the return value of the block" do
+    value = env.exec do
+      1337
+    end
+
+    expect(value).to eq 1337
+  end
 end
