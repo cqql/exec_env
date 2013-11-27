@@ -23,5 +23,5 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.4)
   exec_env!
-  rake
+  rake (~> 10.1)
   rspec
