@@ -14,7 +14,9 @@ module ExecEnv
       @scope = nil
     end
 
-    # Execute a block in the manipulated environent.
+    # Execute a block in the manipulated environment.
+    #
+    # Additional arguments will be passed to the block.
     def exec (*args, &block)
       if @scope
         @scope.instance_variables.each do |name|

@@ -23,7 +23,7 @@ describe ExecEnv::Env do
     expect(value).to eq :test
   end
 
-  it "should introduce bindings from a scope object" do
+  it "should dispatch method calls to the scope object" do
     value = nil
     scope = Object.new
     def scope.it
@@ -38,7 +38,7 @@ describe ExecEnv::Env do
     expect(value).to eq "value"
   end
 
-  it "should use instance variables from a scope object" do
+  it "should inject instance variables from the scope object" do
     value = nil
     scope = Object.new
     scope.instance_variable_set(:@symbol, :value)
@@ -51,7 +51,7 @@ describe ExecEnv::Env do
     expect(value).to eq :value
   end
 
-  it "should dispatch method calls to locals" do
+  it "should dispatch method calls to the scope" do
     value = nil
     scope = Object.new
     def scope.it (value)
@@ -59,7 +59,7 @@ describe ExecEnv::Env do
     end
 
     env.scope = scope
-    env.bindings = { it: :binding }
+    env.locals = { it: :binding }
     env.exec do
       value = it(:scope)
     end
