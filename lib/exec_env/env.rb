@@ -5,15 +5,13 @@ module ExecEnv
   class Env
     attr_writer :locals
     attr_writer :ivars
+    attr_writer :scope
     
     def initialize
       @messages = []
       @locals = {}
       @ivars = {}
-    end
-    
-    def scope= (scope)
-      @scope = scope
+      @scope = nil
     end
 
     # Execute a block in the manipulated environent.
